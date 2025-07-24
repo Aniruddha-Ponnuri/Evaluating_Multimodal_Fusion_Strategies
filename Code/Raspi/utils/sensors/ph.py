@@ -1,17 +1,39 @@
 import RPi.GPIO as GPIO
 import serial
-from logger import CustomLogger
+from utils.logger import CustomLogger
 
 logger = CustomLogger()
 
 # Initialize serial communication for pH sensor
-ph_serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1) 
+ph_serial = None
+
+def initialize_ph_sensor():
+    """
+    Initialize the pH sensor serial connection.
+    """
+    global ph_serial
+    try:
+        if ph_serial is None or not ph_serial.is_open:
+            ph_serial = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+            logger.info("pH sensor serial connection initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize pH sensor: {e}")
+        ph_serial = None
 
 def read_ph():
     """
     Reads and parses data from the pH sensor.
     :return: tuple - (pH value, depth, light value, temperature value)
     """
+    global ph_serial
+    
+    # Ensure sensor is initialized
+    if ph_serial is None or not ph_serial.is_open:
+        initialize_ph_sensor()
+    
+    if ph_serial is None:
+        return None, None, None, None
+    
     try:
         if ph_serial.in_waiting > 0:
             data = ph_serial.readline().decode('utf-8').strip()
@@ -30,6 +52,25 @@ def read_ph():
         return None, None, None, None
     except Exception as e:
         logger.error(f"pH sensor error: {e}")
+        # Try to reinitialize on error
+        try:
+            if ph_serial and ph_serial.is_open:
+                ph_serial.close()
+        except:
+            pass
+        ph_serial = None
         return None, None, None, None
+
+def close_ph_sensor():
+    """
+    Close the pH sensor serial connection.
+    """
+    global ph_serial
+    try:
+        if ph_serial and ph_serial.is_open:
+            ph_serial.close()
+            logger.info("pH sensor serial connection closed")
+    except Exception as e:
+        logger.error(f"Error closing pH sensor: {e}")
     finally:
-        ph_serial.close()
+        ph_serial = None

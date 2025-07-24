@@ -1,7 +1,7 @@
 import os
 import time
 import cv2
-from logger import CustomLogger
+from utils.logger import CustomLogger
 
 logger = CustomLogger()
 def capture_image(rtsp_url, retries=3):
@@ -16,6 +16,7 @@ def capture_image(rtsp_url, retries=3):
     os.makedirs(image_dir, exist_ok=True)  # Ensure 'images/' directory exists
 
     for attempt in range(retries):
+        logger.info(f"Attempting to capture image from RTSP stream (Attempt {attempt + 1}/{retries})")
         video = cv2.VideoCapture(rtsp_url)
         video.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         time.sleep(0.5)  # Stabilize connection

@@ -74,7 +74,8 @@ def collect_and_store_data(rtsp_url):
             # Image
             "image_filename": image_filename
         }
-        logger.info(f"Sensor data written to MongoDB:", sensor_document)
+        logger.info(f"Sensor data written to MongoDB: {sensor_document}")
+        return sensor_document
 
     except KeyboardInterrupt:
         logger.warning("Data collection stopped by user.")

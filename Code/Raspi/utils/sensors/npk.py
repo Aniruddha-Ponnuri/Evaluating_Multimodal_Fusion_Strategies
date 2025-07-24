@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import serial
 import time
-from logger import CustomLogger
+from utils.logger import CustomLogger
 
 logger = CustomLogger()
 npk_serial = serial.Serial('/dev/serial0', baudrate=9600, timeout=1)
@@ -30,5 +30,3 @@ def read_npk():
     except Exception as e:
         logger.error(f"NPK sensor error: {e}")
         return None, None, None
-    finally:
-        npk_serial.close()

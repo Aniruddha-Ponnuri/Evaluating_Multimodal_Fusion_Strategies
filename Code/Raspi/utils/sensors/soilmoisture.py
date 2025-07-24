@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import spidev
-from logger import CustomLogger
+from utils.logger import CustomLogger
 
 logger = CustomLogger()
 def read_moisture_sensor(channel=0):
